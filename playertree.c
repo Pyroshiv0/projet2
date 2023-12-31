@@ -2,7 +2,7 @@
 #include <stdbool.h> // bool, true, false
 #include <stdlib.h> // rand
 #include <stdio.h> // printf
-
+#include <math.h> //abs
 // program header file
 #include "bomberman.h"
 
@@ -35,9 +35,20 @@ void printAction(action);
 void printBoolean(bool);
 int min4(int,int,int,int);
 int posmin4(int,int,int,int);
-action randomMoove(tree);
+int posmax4(int,int,int,int);
+action randommove(tree);
 int depthChar(tree,int,char);
 int GoNearWalls(tree);
+action choose_Side(tree,int);
+int count_Safe_Paths(tree,int,int,bool);
+int IsthereBombs(tree);
+bool sMapBomb(tree);
+action escapeBomb(tree,int,int);
+bool bombThreat(tree,int,int);
+int* posBomb(tree,int*);
+action randomSafeMove(tree,int,int);
+void addTab(int*,int*,int);
+
 /*
   bomberman function:
   This function randomly select a valid move for BOMBERMAN based on its current position on the game map.
@@ -49,32 +60,36 @@ action bomberman(
 		 int explosion_range // explosion range for the bombs 
 		 ) {
   action a; // action to choose and return
-  if (remaining_bombs==0) return randomMoove(map);
+  if (last_action==BOMBING) return choose_Side(map,explosion_range);
   else{
-    int acttodo=GoNearWalls(map);
-    switch (acttodo) 
-    {
-    case 1:
-      a=NORTH;
-      break;
-    case 2:
-      a=EAST;
-      break;
-    case 3:
-      a=SOUTH;
-      break;
-    case 4:
-      a=WEST;
-      break;
-    case 5:
-      a=BOMBING;
-      break;
-    default:
-      a=randomMoove(map);
-      break;
+    int bomb=IsthereBombs(map);
+    if (bomb==-1) {
+      int acttodo=GoNearWalls(map);
+      switch (acttodo) 
+      {
+        case 1:
+          a=NORTH;
+          break;
+        case 2:
+          a=EAST;
+          break;
+        case 3:
+          a=SOUTH;
+          break;
+        case 4:
+          a=WEST;
+          break;
+        case 5:
+          a=BOMBING;
+          break;
+        default:
+          a=randommove(map);
+          break;
+          return a;
+        }
+      }
+    else return escapeBomb(map,bomb,explosion_range);
     }
-    return a;
-  }
 }
 
 /*
@@ -181,7 +196,31 @@ int posmin4(int a,int b,int c,int d){//return the position of the minimum betwee
     }
   }
 }
-action randomMoove(tree map){//do a random moove(not bombing)
+int posmax4(int a,int b,int c,int d){//return the position of the maximum between four ints (a return 0,b return 1 ...)
+  if (a<b){
+    if (b<c){
+      if (c<d)
+        return 4;
+      else
+        return 3;
+    }
+    else{
+      if (b<d) return 4;
+      else return 2; 
+    }
+  }
+  else{
+    if (a<c){
+      if (c<d) return 4;
+      else return 3;
+    }
+    else {
+      if (a<d) return 4;
+      else return 1;
+    }
+  }
+}
+action randommove(tree map){//do a random move(not bombing)
   bool ok=false; // ok will be set to true as soon as a randomly selected action is valid
   action a;
   do {
@@ -219,4 +258,289 @@ action randomMoove(tree map){//do a random moove(not bombing)
   } while(!ok);
 
   return a; // answer to the game engine
+}
+
+action choose_Side(tree map,int explosion_range){
+  int npath=count_Safe_Paths(map->n,1,explosion_range,false);
+  int epath=count_Safe_Paths(map->e,2,explosion_range,false);
+  int spath=count_Safe_Paths(map->s,3,explosion_range,false);
+  int wpath=count_Safe_Paths(map->w,4,explosion_range,false);
+  switch (posmax4(npath,epath,wpath,spath))
+  {
+  case 1:
+    return NORTH;
+    break;
+  case 2:
+    return EAST;
+    break;
+  case 3:
+    return SOUTH;
+    break;
+  case 4:
+    return WEST;
+    break;
+  default:
+    break;
+  }
+}
+
+int count_Safe_Paths(tree smap,int idir,int dleft,bool count){//count the path available for a tree that aren't in bomb range(note: 1=NORTH,2=EAST...)
+  if (smap!=0){
+    if (smap->c==PATH || smap->c==FLAME_BONUS ||smap->c==BOMB_BONUS){
+      if (dleft<=0 && !count)
+          count=true;
+      if (count){
+        return count_Safe_Paths(smap->n,idir,dleft,count)+count_Safe_Paths(smap->e,idir,dleft,count)+count_Safe_Paths(smap->s,idir,dleft,count)+count_Safe_Paths(smap->w,idir,dleft,count)+1;
+      }
+      else{
+        
+        switch(idir){
+          case 1: return count_Safe_Paths(smap->n,idir,dleft-1,false)+count_Safe_Paths(smap->e,idir,dleft-1,true)+count_Safe_Paths(smap->s,idir,dleft-1,true)+count_Safe_Paths(smap->w,idir,dleft-1,true);
+            break;
+          case 2: return count_Safe_Paths(smap->n,idir,dleft-1,true)+count_Safe_Paths(smap->e,idir,dleft-1,false)+count_Safe_Paths(smap->s,idir,dleft-1,true)+count_Safe_Paths(smap->w,idir,dleft-1,true);
+            break;
+          case 3: return count_Safe_Paths(smap->n,idir,dleft-1,true)+count_Safe_Paths(smap->e,idir,dleft-1,true)+count_Safe_Paths(smap->s,idir,dleft-1,false)+count_Safe_Paths(smap->w,idir,dleft-1,true);
+            break;
+          case 4: return count_Safe_Paths(smap->n,idir,dleft-1,true)+count_Safe_Paths(smap->e,idir,dleft-1,true)+count_Safe_Paths(smap->s,idir,dleft-1,true)+count_Safe_Paths(smap->w,idir,dleft-1,false);
+            break;
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+int IsthereBombs(tree map){//return number indicating where is the bomb,-1 if there isn't any bomb(considering that the player only see one bomb because we won't put any bomb in game if we see one)
+  if(sMapBomb(map->n)) return 1;
+  else if(sMapBomb(map->e)) return 2;
+  else if(sMapBomb(map->s)) return 3;
+  else if(sMapBomb(map->w)) return 4;
+  else return -1;
+}
+bool sMapBomb(tree map){//say if  there is a bomb in the tree
+  if (map==0) return false;
+  else if (map->c==BOMB) return true;
+  else return (sMapBomb(map->n)||sMapBomb(map->e)||sMapBomb(map->s)||sMapBomb(map->w));
+}
+
+action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is threatened directly by a bomb.
+  bool isthreatened;
+  switch(bpos) {
+    case 1:
+      isthreatened =bombThreat(map->n,1,explosion_range);
+      break;
+    case 2:
+      isthreatened =bombThreat(map->e,2,explosion_range);
+      break;
+    case 3:
+      isthreatened =bombThreat(map->s,3,explosion_range);
+      break;
+    case 4:
+      isthreatened =bombThreat(map->w,4,explosion_range);
+      break;
+  }
+  if (isthreatened){
+    switch (bpos)
+    {
+    case 1:
+      if ((map->e)->c==PATH){//si on a bien un chemin valide
+        if (((map->e)->s)!=0){
+          if ((((map->e)->s)->c==PATH)) return EAST;
+        }//si la case au sud est valide
+        if (((map->e)->e)!=0){
+          if ((((map->e)->e)->c==PATH)) return EAST;
+        }//si la case au sud est valide
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      if ((map->w)->c==PATH){//si on a bien un chemin valide
+        if (((map->w)->s)!=0){
+          if ((((map->w)->s)->c==PATH)) return WEST;
+        }//si la case au sud est valide
+        if (((map->w)->w)!=0){
+          if ((((map->w)->w)->c==PATH)) return WEST;
+        }//si la case au sud est valide
+        return SOUTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      break;
+    case 2:
+      if ((map->n)->c==PATH){//si on a bien un chemin valide
+        if (((map->n)->w)!=0){
+          if ((((map->n)->w)->c==PATH)) return NORTH;
+        }//si la case au sud est valide
+        if (((map->n)->n)!=0){
+          if ((((map->n)->n)->c==PATH)) return NORTH;
+        }//si la case au sud est valide
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      if ((map->s)->c==PATH){//si on a bien un chemin valide
+        if (((map->s)->w)!=0){
+          if ((((map->s)->w)->c==PATH)) return SOUTH;
+        }//si la case au sud est valide
+        if (((map->s)->s)!=0){
+          if ((((map->s)->s)->c==PATH)) return SOUTH;
+        }//si la case au sud est valide
+        return WEST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      break;
+    case 3:
+      if ((map->e)->c==PATH){//si on a bien un chemin valide
+        if (((map->e)->n)!=0){
+          if ((((map->e)->n)->c==PATH)) return EAST;
+        }//si la case au sud est valide
+        if (((map->e)->e)!=0){
+          if ((((map->e)->e)->c==PATH)) return EAST;
+        }//si la case au sud est valide
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      if ((map->w)->c==PATH){//si on a bien un chemin valide
+        if (((map->w)->n)!=0){
+          if ((((map->w)->n)->c==PATH)) return WEST;
+        }//si la case au sud est valide
+        if (((map->w)->w)!=0){
+          if ((((map->w)->w)->c==PATH)) return WEST;
+        }//si la case au sud est valide
+        return NORTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      break;
+    case 4:
+      if ((map->n)->c==PATH){//si on a bien un chemin valide
+        if (((map->n)->e)!=0){
+          if ((((map->n)->e)->c==PATH)) return NORTH;
+        }//si la case au sud est valide
+        if (((map->n)->n)!=0){
+          if ((((map->n)->n)->c==PATH)) return NORTH;
+        }//si la case au sud est valide
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      if ((map->s)->c==PATH){//si on a bien un chemin valide
+        if (((map->s)->e)!=0){
+          if ((((map->s)->e)->c==PATH)) return SOUTH;
+        }//si la case au sud est valide
+        if (((map->s)->s)!=0){
+          if ((((map->s)->s)->c==PATH)) return SOUTH;
+        }//si la case au sud est valide
+        return EAST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+        //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
+      }
+      break;
+    default:
+      break;
+    }
+  }
+  else return randomSafemove(map,bpos);
+}
+bool bombThreat(tree map,int dir,int dleft){//check if we are directly threat by a bomb in the tree.
+  if (dleft<=0) return false;
+  else if (map==0) return false;
+  else if (map->c==BOMB) return true;
+  else {
+    switch (dir)
+    {
+    case 1:
+      return bombThreat(map->n,dir,dleft-1);
+      break;
+    case 2:
+      return bombThreat(map->e,dir,dleft-1);
+      break;
+    case 3:
+      return bombThreat(map->s,dir,dleft-1);
+      break;
+    case 4:
+      return bombThreat(map->w,dir,dleft-1);
+      break;
+    default:
+      break;
+    }
+  }
+}
+int* posBomb(tree map,int* pos){
+  if (pos[2]==1) return pos;
+  else{
+    if (map==0) return pos;
+    else if (map->c==BOMB){
+      pos[2]=1;
+      return pos;
+    }
+    else{
+      if (map->c==PATH){
+        int npos[3]={-1,0,0};
+        int epos[3]={0,1,0};
+        int spos[3]={1,0,0};
+        int wpos[3]={0,-1,0};
+        addTab(pos,npos,3);
+        addTab(pos,epos,3);
+        addTab(pos,spos,3);
+        addTab(pos,wpos,3);
+        *npos=posBomb(map->n,npos);
+        *epos=posBomb(map->n,epos);
+        *spos=posBomb(map->n,spos);
+        *wpos=posBomb(map->n,wpos);
+        if (npos[2]==1) return npos;
+        else if (epos[2]==1) return epos;
+        else if (spos[2]==1) return epos;
+        else if (wpos[2]==1) return wpos;
+        else return pos;
+      }
+      else return pos;
+    }
+  }
+}
+action randomSafeMove(tree map,int bdir,int explosion_range){//return a random safemove.
+  int bpos[3]={0,0,0};//x,y,found
+  switch (bdir)
+  {
+  case 1:
+    bpos[0]-=1;//car on va vers le nord
+    *bpos=posBomb(map->n,bpos);
+    printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
+    break;
+  case 2:
+    bpos[1]+=1;//car on va vers le nord
+    *bpos=posBomb(map->e,bpos);
+    printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
+    break;
+  case 3:
+    bpos[0]+=1;//car on va vers le nord
+    *bpos=posBomb(map->s,bpos);
+    printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
+    break;
+  case 4:
+    bpos[1]-=1;//car on va vers le nord
+    *bpos=posBomb(map->w,bpos);
+    printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
+    break;  
+  default:
+    break;
+  }
+  //try and verify if north is valid
+  if (map->n != 0){
+    if (map->n ==PATH){
+      if (!(bpos[0]-1==0 && abs(bpos[1])<=explosion_range)) return NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+    }
+  } 
+  //try and verify if east is valid
+  else if (map->e != 0){
+    if (map->e ==PATH){
+      if (!(bpos[1]+1==0 && abs(bpos[0])<=explosion_range)) return EAST;//if east move don't put bomberman in danger,we do it
+    } 
+  }
+  else if (map->s != 0){
+    if (map->s ==PATH){
+      if (!(bpos[0]+1==0 && abs(bpos[1])<=explosion_range)) return SOUTH;//if east move don't put bomberman in danger,we do it
+    } 
+  }
+  else if (map->w != 0){
+    if (map->w ==PATH){
+      if (!(bpos[1]-1==0 && abs(bpos[0])<=explosion_range)) return WEST;//if east move don't put bomberman in danger,we do it
+    } 
+  }
+  else return randomMove(map);//if it don't work,we return at list a random move
+}
+void addTab(int* tab1,int* tab2,int taille){//add the first tab in the second tab(el 1+ el2 =el returned)
+  for (int i=0;i<taille;i++){
+    tab2[i]+=tab1[i];
+  }
 }
