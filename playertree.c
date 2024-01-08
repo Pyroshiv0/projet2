@@ -48,7 +48,7 @@ bool bombThreat(tree,int,int);
 int* posBomb(tree,int*);
 action randomSafeMove(tree,int,int);
 void addTab(int*,int*,int);
-
+void copyTab(int*,int*,int);
 /*
   bomberman function:
   This function randomly select a valid move for BOMBERMAN based on its current position on the game map.
@@ -60,7 +60,7 @@ action bomberman(
 		 int explosion_range // explosion range for the bombs 
 		 ) {
   action a; // action to choose and return
-  if (last_action==BOMBING) return choose_Side(map,explosion_range);
+  if (last_action==BOMBING) a=choose_Side(map,explosion_range);
   else{
     int bomb=IsthereBombs(map);
     if (bomb==-1) {
@@ -85,11 +85,12 @@ action bomberman(
         default:
           a=randommove(map);
           break;
-          return a;
+         
         }
       }
-    else return escapeBomb(map,bomb,explosion_range);
+    else a=escapeBomb(map,bomb,explosion_range);
     }
+    return a;
 }
 
 /*
@@ -265,23 +266,25 @@ action choose_Side(tree map,int explosion_range){
   int epath=count_Safe_Paths(map->e,2,explosion_range,false);
   int spath=count_Safe_Paths(map->s,3,explosion_range,false);
   int wpath=count_Safe_Paths(map->w,4,explosion_range,false);
+  action a;
   switch (posmax4(npath,epath,wpath,spath))
   {
   case 1:
-    return NORTH;
+    a=NORTH;
     break;
   case 2:
-    return EAST;
+    a=EAST;
     break;
   case 3:
-    return SOUTH;
+    a=SOUTH;
     break;
   case 4:
-    return WEST;
+    a=WEST;
     break;
   default:
     break;
   }
+  return a;
 }
 
 int count_Safe_Paths(tree smap,int idir,int dleft,bool count){//count the path available for a tree that aren't in bomb range(note: 1=NORTH,2=EAST...)
@@ -430,7 +433,7 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
       break;
     }
   }
-  else return randomSafemove(map,bpos);
+  else return randomSafeMove(map,bpos,explosion_range);
 }
 bool bombThreat(tree map,int dir,int dleft){//check if we are directly threat by a bomb in the tree.
   if (dleft<=0) return false;
@@ -474,14 +477,34 @@ int* posBomb(tree map,int* pos){
         addTab(pos,epos,3);
         addTab(pos,spos,3);
         addTab(pos,wpos,3);
-        *npos=posBomb(map->n,npos);
-        *epos=posBomb(map->n,epos);
-        *spos=posBomb(map->n,spos);
-        *wpos=posBomb(map->n,wpos);
-        if (npos[2]==1) return npos;
-        else if (epos[2]==1) return epos;
-        else if (spos[2]==1) return epos;
-        else if (wpos[2]==1) return wpos;
+        copyTab(posBomb(map->n,npos),npos,3);
+        copyTab(posBomb(map->n,epos),epos,3);
+        copyTab(posBomb(map->n,spos),spos,3);
+        copyTab(posBomb(map->n,wpos),wpos,3);
+        if (npos[2]==1) {
+        	pos[0]=npos[0];
+        	pos[1]=npos[1];
+        	pos[2]=1;
+        	return pos;
+        }
+        else if (epos[2]==1) {
+        	pos[0]=epos[0];
+        	pos[1]=epos[1];
+        	pos[2]=1;
+        	return pos;
+        }
+        else if (spos[2]==1) {
+        	pos[0]=spos[0];
+        	pos[1]=spos[1];
+        	pos[2]=1;
+        	return pos;
+        }
+        else if (wpos[2]==1) {
+        	pos[0]=wpos[0];
+        	pos[1]=wpos[1];
+        	pos[2]=1;
+        	return pos;
+        }
         else return pos;
       }
       else return pos;
@@ -494,22 +517,22 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   {
   case 1:
     bpos[0]-=1;//car on va vers le nord
-    *bpos=posBomb(map->n,bpos);
+    copyTab(posBomb(map->n,bpos),bpos,3);
     printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
     break;
   case 2:
     bpos[1]+=1;//car on va vers le nord
-    *bpos=posBomb(map->e,bpos);
+    copyTab(posBomb(map->e,bpos),bpos,3);
     printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
     break;
   case 3:
     bpos[0]+=1;//car on va vers le nord
-    *bpos=posBomb(map->s,bpos);
+    copyTab(posBomb(map->s,bpos),bpos,3);
     printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
     break;
   case 4:
     bpos[1]-=1;//car on va vers le nord
-    *bpos=posBomb(map->w,bpos);
+    copyTab(posBomb(map->w,bpos),bpos,3);
     printf("bomb pos : x:%d,y:%d",bpos[0],bpos[1]);
     break;  
   default:
@@ -517,30 +540,35 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   }
   //try and verify if north is valid
   if (map->n != 0){
-    if (map->n ==PATH){
+    if ((map->n)->c ==PATH){
       if (!(bpos[0]-1==0 && abs(bpos[1])<=explosion_range)) return NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
     }
   } 
   //try and verify if east is valid
   else if (map->e != 0){
-    if (map->e ==PATH){
+    if ((map->e)->c ==PATH){
       if (!(bpos[1]+1==0 && abs(bpos[0])<=explosion_range)) return EAST;//if east move don't put bomberman in danger,we do it
     } 
   }
   else if (map->s != 0){
-    if (map->s ==PATH){
+    if ((map->s)->c ==PATH){
       if (!(bpos[0]+1==0 && abs(bpos[1])<=explosion_range)) return SOUTH;//if east move don't put bomberman in danger,we do it
     } 
   }
   else if (map->w != 0){
-    if (map->w ==PATH){
+    if ((map->w)->c ==PATH){
       if (!(bpos[1]-1==0 && abs(bpos[0])<=explosion_range)) return WEST;//if east move don't put bomberman in danger,we do it
     } 
   }
-  else return randomMove(map);//if it don't work,we return at list a random move
+  else return randommove(map);//if it don't work,we return at list a random move
 }
 void addTab(int* tab1,int* tab2,int taille){//add the first tab in the second tab(el 1+ el2 =el returned)
   for (int i=0;i<taille;i++){
     tab2[i]+=tab1[i];
+  }
+}
+void copyTab(int* tab1,int* tab2,int taille){//copythe first tab in the second tab(el 1+ el2 =el returned)
+  for (int i=0;i<taille;i++){
+    tab2[i]=tab1[i];
   }
 }
