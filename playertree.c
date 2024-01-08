@@ -198,26 +198,44 @@ int posmin4(int a,int b,int c,int d){//return the position of the minimum betwee
   }
 }
 int posmax4(int a,int b,int c,int d){//return the position of the maximum between four ints (a return 0,b return 1 ...)
+  printf("safe paths:north:%d,east:%d,south:%d,west:%d\n",a,b,c,d);
   if (a<b){
+  printf("a<b:%d<%d\n",a,b);
     if (b<c){
-      if (c<d)
-        return 4;
-      else
-        return 3;
+    	printf("a<b<c:%d<%d<%d\n",a,b,c);
+      if (c<d){
+      	printf("a<b<c<d:%d<%d<%d<%d\n",a,b,c,d);
+        return 4;}
+      else{
+      	printf("a<b<d<c:%d<%d<%d>%d\n",a,b,d,c);
+        return 3;}
     }
     else{
-      if (b<d) return 4;
-      else return 2; 
+    	printf("a<c<b:%d<%d<%d\n",a,c,b);
+      if (b<d) {
+      	printf("a<c<b<d:%d<%d<%d>%d\n",a,c,b,d);
+      	return 4;}
+      else {
+      printf("a<=c<=d<b:%d<%d<%d%d\n",a,c,d,b);
+      return 2; }
     }
   }
   else{
+    printf("a>b:%d>%d\n",a,b);
     if (a<c){
-      if (c<d) return 4;
-      else return 3;
+    	printf("b<=a<c:%d<=%d<%d\n",b,a,c);
+      if (c<d) {
+      printf("b<=a<=c<d:%d<%d<%d%d\n",b,a,c,d);
+      return 4;}
+      else {printf("b<=a<=d<c:%d<%d<%d%d\n",b,a,d,c);
+      return 3;}
+      
     }
     else {
-      if (a<d) return 4;
-      else return 1;
+      if (a<d){printf("b<=c<=a<d:%d<%d<%d%d\n",b,c,a,d);
+       return 4;}
+      else {printf("b<=c<=d<a:%d<%d<%d%d\n",b,c,d,a);
+      return 1;}
     }
   }
 }
@@ -266,8 +284,9 @@ action choose_Side(tree map,int explosion_range){
   int epath=count_Safe_Paths(map->e,2,explosion_range,false);
   int spath=count_Safe_Paths(map->s,3,explosion_range,false);
   int wpath=count_Safe_Paths(map->w,4,explosion_range,false);
+ 
   action a;
-  switch (posmax4(npath,epath,wpath,spath))
+  switch (posmax4(npath,epath,spath,wpath))
   {
   case 1:
     a=NORTH;
