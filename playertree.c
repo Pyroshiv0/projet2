@@ -342,126 +342,129 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
       isthreatened =bombThreat(map->w,4,explosion_range);
       break;
   }
+  action a;
   if (isthreatened){
     switch (bpos)
     {
     case 1:
       if ((map->e)->c==PATH){//si on a bien un chemin valide
         if (((map->e)->s)!=0){
-          if ((((map->e)->s)->c==PATH)) return EAST;
+          if ((((map->e)->s)->c==PATH)) a= EAST;
         }//si la case au sud est valide
         if (((map->e)->e)!=0){
-          if ((((map->e)->e)->c==PATH)) return EAST;
+          if ((((map->e)->e)->c==PATH)) a=EAST;
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
-      if ((map->w)->c==PATH){//si on a bien un chemin valide
+      else if ((map->w)->c==PATH){//si on a bien un chemin valide
         if (((map->w)->s)!=0){
-          if ((((map->w)->s)->c==PATH)) return WEST;
+          if ((((map->w)->s)->c==PATH)) a=WEST;
         }//si la case au sud est valide
         if (((map->w)->w)!=0){
-          if ((((map->w)->w)->c==PATH)) return WEST;
-        }//si la case au sud est valide
-        return SOUTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+          if ((((map->w)->w)->c==PATH)) a=WEST;
+        }}//si la case au sud est valide
+      else a= SOUTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
-      }
+      
       break;
     case 2:
       if ((map->n)->c==PATH){//si on a bien un chemin valide
         if (((map->n)->w)!=0){
-          if ((((map->n)->w)->c==PATH)) return NORTH;
+          if ((((map->n)->w)->c==PATH)) a=NORTH;
         }//si la case au sud est valide
         if (((map->n)->n)!=0){
-          if ((((map->n)->n)->c==PATH)) return NORTH;
+          if ((((map->n)->n)->c==PATH)) a=NORTH;
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
-      if ((map->s)->c==PATH){//si on a bien un chemin valide
+      else if ((map->s)->c==PATH){//si on a bien un chemin valide
         if (((map->s)->w)!=0){
-          if ((((map->s)->w)->c==PATH)) return SOUTH;
+          if ((((map->s)->w)->c==PATH)) a=SOUTH;
         }//si la case au sud est valide
         if (((map->s)->s)!=0){
-          if ((((map->s)->s)->c==PATH)) return SOUTH;
-        }//si la case au sud est valide
-        return WEST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+          if ((((map->s)->s)->c==PATH)) a=SOUTH;
+      }}//si la case au sud est valide
+      else a=WEST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
-      }
+      
       break;
     case 3:
       if ((map->e)->c==PATH){//si on a bien un chemin valide
         if (((map->e)->n)!=0){
-          if ((((map->e)->n)->c==PATH)) return EAST;
+          if ((((map->e)->n)->c==PATH)) a= EAST;
         }//si la case au sud est valide
         if (((map->e)->e)!=0){
-          if ((((map->e)->e)->c==PATH)) return EAST;
+          if ((((map->e)->e)->c==PATH)) a= EAST;
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
-      if ((map->w)->c==PATH){//si on a bien un chemin valide
+      else if ((map->w)->c==PATH){//si on a bien un chemin valide
         if (((map->w)->n)!=0){
-          if ((((map->w)->n)->c==PATH)) return WEST;
+          if ((((map->w)->n)->c==PATH)) a= WEST;
         }//si la case au sud est valide
         if (((map->w)->w)!=0){
-          if ((((map->w)->w)->c==PATH)) return WEST;
-        }//si la case au sud est valide
-        return NORTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+          if ((((map->w)->w)->c==PATH)) a= WEST;
+        }}//si la case au sud est valide
+      else a=NORTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
-      }
+      
       break;
     case 4:
       if ((map->n)->c==PATH){//si on a bien un chemin valide
         if (((map->n)->e)!=0){
-          if ((((map->n)->e)->c==PATH)) return NORTH;
+          if ((((map->n)->e)->c==PATH)) a= NORTH;
         }//si la case au sud est valide
         if (((map->n)->n)!=0){
-          if ((((map->n)->n)->c==PATH)) return NORTH;
+          if ((((map->n)->n)->c==PATH)) a=NORTH;
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
-      if ((map->s)->c==PATH){//si on a bien un chemin valide
+      else if ((map->s)->c==PATH){//si on a bien un chemin valide
         if (((map->s)->e)!=0){
-          if ((((map->s)->e)->c==PATH)) return SOUTH;
+          if ((((map->s)->e)->c==PATH)) a=SOUTH;
         }//si la case au sud est valide
         if (((map->s)->s)!=0){
-          if ((((map->s)->s)->c==PATH)) return SOUTH;
-        }//si la case au sud est valide
-        return EAST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
+          if ((((map->s)->s)->c==PATH)) a=SOUTH;
+        }}//si la case au sud est valide
+      else a=EAST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
-      }
+      
       break;
     default:
       break;
     }
+    return a;
   }
   else return randomSafeMove(map,bpos,explosion_range);
 }
 bool bombThreat(tree map,int dir,int dleft){//check if we are directly threat by a bomb in the tree.
-  if (dleft<=0) return false;
-  else if (map==0) return false;
-  else if (map->c==BOMB) return true;
+  bool ret=false;
+  if (dleft<=0) ret=false;
+  else if (map==0) ret=false;
+  else if (map->c==BOMB) ret=true;
   else {
     switch (dir)
     {
     case 1:
-      return bombThreat(map->n,dir,dleft-1);
+      ret=bombThreat(map->n,dir,dleft-1);
       break;
     case 2:
-      return bombThreat(map->e,dir,dleft-1);
+      ret=bombThreat(map->e,dir,dleft-1);
       break;
     case 3:
-      return bombThreat(map->s,dir,dleft-1);
+      ret=bombThreat(map->s,dir,dleft-1);
       break;
     case 4:
-      return bombThreat(map->w,dir,dleft-1);
+      ret=bombThreat(map->w,dir,dleft-1);
       break;
     default:
       break;
     }
   }
+  return ret;
 }
 int* posBomb(tree map,int* pos){
-  if (pos[2]==1) return pos;
-  else{
+  if (pos[2]!=1){
     if (map==0) return pos;
     else if (map->c==BOMB){
       pos[2]=1;
@@ -510,6 +513,7 @@ int* posBomb(tree map,int* pos){
       else return pos;
     }
   }
+  return pos;
 }
 action randomSafeMove(tree map,int bdir,int explosion_range){//return a random safemove.
   int bpos[3]={0,0,0};//x,y,found
