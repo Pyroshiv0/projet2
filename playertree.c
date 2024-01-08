@@ -542,29 +542,31 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   default:
     break;
   }
+  action a;
   //try and verify if north is valid
   if (map->n != 0){
     if ((map->n)->c ==PATH){
-      if (!(bpos[0]-1==0 && abs(bpos[1])<=explosion_range)) return NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+      if (!(bpos[0]-1==0 && abs(bpos[1])<=explosion_range)) a=NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
     }
   } 
   //try and verify if east is valid
   else if (map->e != 0){
     if ((map->e)->c ==PATH){
-      if (!(bpos[1]+1==0 && abs(bpos[0])<=explosion_range)) return EAST;//if east move don't put bomberman in danger,we do it
+      if (!(bpos[1]+1==0 && abs(bpos[0])<=explosion_range)) a= EAST;//if east move don't put bomberman in danger,we do it
     } 
   }
   else if (map->s != 0){
     if ((map->s)->c ==PATH){
-      if (!(bpos[0]+1==0 && abs(bpos[1])<=explosion_range)) return SOUTH;//if east move don't put bomberman in danger,we do it
+      if (!(bpos[0]+1==0 && abs(bpos[1])<=explosion_range)) a= SOUTH;//if east move don't put bomberman in danger,we do it
     } 
   }
   else if (map->w != 0){
     if ((map->w)->c ==PATH){
-      if (!(bpos[1]-1==0 && abs(bpos[0])<=explosion_range)) return WEST;//if east move don't put bomberman in danger,we do it
+      if (!(bpos[1]-1==0 && abs(bpos[0])<=explosion_range)) a=WEST;//if east move don't put bomberman in danger,we do it
     } 
   }
-  else return randommove(map);//if it don't work,we return at list a random move
+  else a= randommove(map);//if it don't work,we return at list a random move
+  return a;
 }
 void addTab(int* tab1,int* tab2,int taille){//add the first tab in the second tab(el 1+ el2 =el returned)
   for (int i=0;i<taille;i++){
