@@ -101,7 +101,7 @@ action bomberman(
     else {a=escapeBomb(map,bomb,explosion_range);
     	  printf("called escapeBomb\n");
     }}
-    return a;
+    return SafeLook(map,a);
 }
 
 /*
@@ -131,6 +131,42 @@ void printAction(action a) {
   }
 }
 
+action SafeLook(tree map,action a) {
+  switch(a) {
+  case BOMBING:
+    return BOMBING;
+    break;
+  case NORTH:
+    if ((map->n)->c==BREAKABLE_WALL||(map->n)->c==WALL ||(map->n)->c==BOMB){
+      printf("north is deadlygo randomMove");
+      return SafeLook(map,randommove(map));
+    }
+    break;
+  case EAST:
+    if ((map->e)->c==BREAKABLE_WALL||(map->e)->c==WALL ||(map->e)->c==BOMB){
+      printf("east is deadlygo randomMove");
+      return SafeLook(map,randommove(map));
+    }
+    break;
+  case SOUTH:
+    if ((map->s)->c==BREAKABLE_WALL||(map->s)->c==WALL ||(map->s)->c==BOMB){
+      printf("south is deadlygo randomMove");
+      return SafeLook(map,randommove(map));
+    }
+    break;
+  case WEST:
+    if ((map->w)->c==BREAKABLE_WALL||(map->w)->c==WALL ||(map->w)->c==BOMB){
+      printf("west is deadlygo randomMove");
+      return SafeLook(map,randommove(map));
+    }
+    break;
+  default:
+  	printf("NO Action?go randomMove");
+    return SafeLook(map,randommove(map));
+  	break;
+  }
+  return a;
+}
 
 /*
   printBoolean procedure:
