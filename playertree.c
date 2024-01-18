@@ -68,13 +68,14 @@ action bomberman(
   action a; // action to choose and return
   if (last_action==BOMBING) {
   	a=choose_Side(map,explosion_range);
-  	printf("called ChooseSide\n");}
+  	//printf("called ChooseSide\n");
+  	}
   else{
     int bomb=IsthereBombs(map);
     if (bomb==-1) {
     	if (IsthereBonuses(map)){
     		int acttodo=GoNearBonuses(map);
-		printf("bONUS?\n");
+		//printf("bONUS?\n");
 		switch (acttodo) 
 		{
 		case 1:
@@ -94,7 +95,7 @@ action bomberman(
 			break;
 		default:
 			a=randommove(map);
-			printf("called randomMove\n");
+			//printf("called randomMove\n");
 			break;
 			 
 		}
@@ -102,7 +103,7 @@ action bomberman(
 	 else{     
 	 	if (IsthereWalls(map)){
 		      int acttodo=GoNearWalls(map);
-		      printf("Go Near Walls\n");
+		      //printf("Go Near Walls\n");
 		      switch (acttodo) 
 		      {
 			case 1:
@@ -122,7 +123,7 @@ action bomberman(
 			  break;
 			default:
 			  a=randommove(map);
-			  printf("called randomMove\n");
+			  //printf("called randomMove\n");
 			  break;
 			 
 			}
@@ -132,7 +133,7 @@ action bomberman(
       }
       }
     else {a=escapeBomb(map,bomb,explosion_range);
-    	  printf("called escapeBomb\n");
+    	  //printf("called escapeBomb\n");
     }}
     return SafeLook(map,a);
 }
@@ -171,30 +172,30 @@ action SafeLook(tree map,action a) {
     break;
   case NORTH:
     if ((map->n)->c==BREAKABLE_WALL||(map->n)->c==WALL ||(map->n)->c==BOMB){
-      printf("north is deadlygo randomMove");
+      //printf("north is deadlygo randomMove");
       return SafeLook(map,randommove(map));
     }
     break;
   case EAST:
     if ((map->e)->c==BREAKABLE_WALL||(map->e)->c==WALL ||(map->e)->c==BOMB){
-      printf("east is deadlygo randomMove");
+      //printf("east is deadlygo randomMove");
       return SafeLook(map,randommove(map));
     }
     break;
   case SOUTH:
     if ((map->s)->c==BREAKABLE_WALL||(map->s)->c==WALL ||(map->s)->c==BOMB){
-      printf("south is deadlygo randomMove");
+      //printf("south is deadlygo randomMove");
       return SafeLook(map,randommove(map));
     }
     break;
   case WEST:
     if ((map->w)->c==BREAKABLE_WALL||(map->w)->c==WALL ||(map->w)->c==BOMB){
-      printf("west is deadlygo randomMove");
+      //printf("west is deadlygo randomMove");
       return SafeLook(map,randommove(map));
     }
     break;
   default:
-  	printf("NO Action?go randomMove");
+  	//printf("NO Action?go randomMove");
     return SafeLook(map,randommove(map));
   	break;
   }
@@ -228,13 +229,13 @@ int GoNearBonuses(tree map){//se rapproche d'un mur et pose une bombe
   int edep=depthChar(map->e,0,BOMB_BONUS);
   int sdep=depthChar(map->s,0,BOMB_BONUS);
   int wdep=depthChar(map->w,0,BOMB_BONUS);
-  printf("%d ,%d ,%d ,%d (bomb)\n",ndep,edep,sdep,wdep);
+  //printf("%d ,%d ,%d ,%d (bomb)\n",ndep,edep,sdep,wdep);
   if (ndep>=10000 && edep>=10000 && sdep>=10000 && wdep>=10000 ) {
   	ndep=depthChar(map->n,0,FLAME_BONUS);
   	edep=depthChar(map->e,0,FLAME_BONUS);
   	sdep=depthChar(map->s,0,FLAME_BONUS);
   	wdep=depthChar(map->w,0,FLAME_BONUS);
-  	printf("%d ,%d ,%d ,%d (flame)\n",ndep,edep,sdep,wdep);
+  	//printf("%d ,%d ,%d ,%d (flame)\n",ndep,edep,sdep,wdep);
   	
   	return posmin4(ndep,edep,sdep,wdep); 
   }
@@ -576,7 +577,7 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
 }
 bool bombThreat(tree map,int dir,int dleft){//check if we are directly threat by a bomb in the tree.
   bool ret=false;
-  printf("dir :%d\n",dir);
+  //printf("dir :%d\n",dir);
   if (dleft<=0) ret=false;
   else if (map==0) ret=false;
   else if (map->c==BOMB) ret=true;
@@ -688,12 +689,12 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   }
   action a;
   bool choose=false;
-  printf("bpos : (%d,%d)",bpos[0],bpos[1]);
+  //printf("bpos : (%d,%d)",bpos[0],bpos[1]);
   //try and verify if north is valid
   if (map->n != 0){
     if ((map->n)->c ==PATH){
       if (!((bpos[0]+1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0])<=explosion_range))){
-      	printf("north? %d %d",bpos[0],bpos[1]);
+      	//printf("north? %d %d",bpos[0],bpos[1]);
       	a=NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
       	choose=true;
       	}
@@ -705,7 +706,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
 	    if ((map->e)->c ==PATH){
 	      if (!((bpos[0]==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]-1==0) && (abs(bpos[0])<=explosion_range))){
 	      	a= EAST;//if east move don't put bomberman in danger,we do it
-	      	printf("east? %d %d",bpos[0],bpos[1]);
+	      	//printf("east? %d %d",bpos[0],bpos[1]);
 	      	choose=true;
 	      	}
 	    } 
@@ -716,7 +717,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
 	    if ((map->s)->c ==PATH){
 	      if (!((bpos[0]-1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0])<=explosion_range))){
 	      	a= SOUTH;//if east move don't put bomberman in danger,we do it
-	      	printf("south? %d %d",bpos[0],bpos[1]);
+	      	//printf("south? %d %d",bpos[0],bpos[1]);
 	      	choose=true;
 	      	}
 	    } 
@@ -727,14 +728,15 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
 	    if ((map->w)->c ==PATH){
 	      if (!((bpos[0]==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]+1==0) && (abs(bpos[0])<=explosion_range))){
 	      	a=WEST;//if east move don't put bomberman in danger,we do it
-	      	printf("west? %d %d",bpos[0],bpos[1]);
+	      	//printf("west? %d %d",bpos[0],bpos[1]);
 	      	choose=true;
 	      	}
 	    } 
 	  }
   }
   if (!choose){ a= randommove(map);//if it don't work,we return at list a random move
-  printf("uh? \n");}
+  printf("uh? \n");
+  }
   printAction(a);
   return a;
 }
