@@ -89,7 +89,7 @@ action bomberman(
     if (bomb==-1) {
         if (isThereEnemies(map)){
           if (isThereExit(map)){
-            int acttodo=GoNearExit(map);
+            int acttodo=goToExit(map);
             switch (acttodo) 
                 {
                   case 1:
@@ -130,31 +130,64 @@ action bomberman(
               case 5:
                 a=BOMBING;
                 break;
-              case 6://we aren't near an enemy
+              case 6://we aren't near an enemy,we won't go for him
                 int acttodo=GoNearEnemy(map);
-                  //printf("Go Near Walls\n");
+                        //printf("Go Near Walls\n");
+                if (isThereBonuses(map)){
+                  int acttodo=GoNearBonuses(map);
+                  //printf("bONUS?\n");
                   switch (acttodo) 
                   {
-                    case 1:
-                      a=NORTH;
-                      break;
-                    case 2:
-                      a=EAST;
-                      break;
-                    case 3:
-                      a=SOUTH;
-                      break;
-                    case 4:
-                      a=WEST;
-                      break;
-                    case 5:
-                      a=BOMBING;
-                      break;
-                    default:
-                      a=randommove(map);
-                      //printf("called randomMove\n");
-                      break;            
+                  case 1:
+                    a=NORTH;
+                    break;
+                  case 2:
+                    a=EAST;
+                    break;
+                  case 3:
+                    a=SOUTH;
+                    break;
+                  case 4:
+                    a=WEST;
+                    break;
+                  case 5:
+                    a=BOMBING;
+                    break;
+                  default:
+                    a=randommove(map);
+                    //printf("called randomMove\n");
+                    break;
                   }
+                }
+                else{     
+                  if (isThereWalls(map)){
+                        int acttodo=GoNearWalls(map);
+                        //printf("Go Near Walls\n");
+                        switch (acttodo) 
+                        {
+                          case 1:
+                            a=NORTH;
+                            break;
+                          case 2:
+                            a=EAST;
+                            break;
+                          case 3:
+                            a=SOUTH;
+                            break;
+                          case 4:
+                            a=WEST;
+                            break;
+                          case 5:
+                            a=BOMBING;
+                            break;
+                          default:
+                            a=randommove(map);
+                            //printf("called randomMove\n");
+                            break;            
+                        }
+                  }
+                  else a=randommove(map);
+                }
                 break;
             }
         }}
