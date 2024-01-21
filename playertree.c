@@ -316,7 +316,7 @@ int depthChar(tree toexp,int depth,char chartofind){//gives the depth at which a
 int depthCharEnemy(tree toexp,int depth){//gives the depth at which a specific character is found in a character tree. If not found, returns 10000.(val "infinite")
   if (toexp==0) return 10000;//if the subtree is empty
   else{
-    if (IsAnEnemy(toexp->c)) return depth;
+    if (IsAnEnemy(toexp)) return depth;
     else if (toexp->c==PATH) return min4(depthCharEnemy(toexp->n,depth+1),depthCharEnemy(toexp->e,depth+1),depthCharEnemy(toexp->s,depth+1),depthCharEnemy(toexp->w,depth+1));
     else return 10000;  
 }}
@@ -660,9 +660,10 @@ action choose_Side(tree map,int explosion_range){
     int temp4=wpath;
     order4(&temp1,&temp2,&temp3,&temp4);
     printf("temp1=%d temp2=%d temp3=%d temp4=%d\n npath=%d epath=%d spath=%d, wpath=%d\n",temp1,temp2,temp3,temp4,npath,epath,spath,wpath);
-    if (temp1==npath){printf("ebemy at north\n");
-        if (depthCharEnemy(map->n,0)<=6){
-          
+    if (temp1==npath){
+        if (depthCharEnemy(map->n,0)<=4){//si on a un ennemi proche au nord
+          printf("ebemy at north\n");
+          //on va au second chemin indiqué par temp2
           if (temp2==spath && temp2 >=2){
             a=SOUTH;
             printf("at least 2 path at south\n");
@@ -677,26 +678,11 @@ action choose_Side(tree map,int explosion_range){
           else {a=NORTH;
           printf("north at least:/ \n");}
         }
-        else{switch (posMax4(npath,epath,spath,wpath))
-        {
-        case 1:
-          a=NORTH;
-          break;
-        case 2:
-          a=EAST;
-          break;
-        case 3:
-          a=SOUTH;
-          break;
-        case 4:
-          a=WEST;
-          break;
-        default:
-          break;
-        }}
+        else a=NORTH;
     }
     else if (temp1==epath){
-        if (depthCharEnemy(map->e,0)<=6){
+        if (depthCharEnemy(map->e,0)<=4){
+          printf("ebemy at east\n");
           if (temp2==wpath && temp2 >=2){
             a=WEST;
             printf("at least 2 path at wesr\n");
@@ -709,28 +695,13 @@ action choose_Side(tree map,int explosion_range){
           }
           else{ a=EAST;
           printf("east at least:/ \n");
-        }}
-        else{switch (posMax4(npath,epath,spath,wpath))
-        {
-        case 1:
-          a=NORTH;
-          break;
-        case 2:
-          a=EAST;
-          break;
-        case 3:
-          a=SOUTH;
-          break;
-        case 4:
-          a=WEST;
-          break;
-        default:
-          break;
+          }
         }
-        }}
+        else a=EAST;
+    }
     else if (temp1==spath){  
-      printf("ebemy at south\n");
-        if (depthCharEnemy(map->s,0)<=6){
+        if (depthCharEnemy(map->s,0)<=4){ 
+          printf("enemy at south\n");
           if (temp2==npath && temp2 >=2){printf("at least 2 path at north\n");
             a=NORTH;
           }
@@ -743,26 +714,11 @@ action choose_Side(tree map,int explosion_range){
           else {a=SOUTH;
           printf("south at list");}
         }
-        else{switch (posMax4(npath,epath,spath,wpath))
-        {
-        case 1:
-          a=NORTH;
-          break;
-        case 2:
-          a=EAST;
-          break;
-        case 3:
-          a=SOUTH;
-          break;
-        case 4:
-          a=WEST;
-          break;
-        default:
-          break;
-        }}
+        else SOUTH;
     }
-    else { printf("ebemy at west\n");
-        if (depthCharEnemy(map->w,0)<=6){
+    else { 
+        if (depthCharEnemy(map->w,0)<=4){
+          printf("enemy at west\n");
           if (temp2==epath && temp2 >=2){printf("at least 2 path at east\n");
             a=EAST;
           }
@@ -776,7 +732,6 @@ action choose_Side(tree map,int explosion_range){
           printf("west at list");}
         }
     }
-    //si on a un ennemi on préfère éviter ce coté et on prendds le chemin du dessous.Faire attention à la distance de l'ennemi si elle est trop grande!
   }
   else{
     
@@ -866,7 +821,7 @@ bool isThereEnemies(tree map){//return if player see an enemy
 }
 bool sMapEnemy(tree map){
   if (map==0) return false;
-  else if (IsAnEnemy(map->c)) return true;
+  else if (IsAnEnemy(map)) return true;
   else return (sMapEnemy(map->n)||sMapEnemy(map->e)||sMapEnemy(map->s)||sMapEnemy(map->w));
 }
 action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is threatened directly by a bomb.
