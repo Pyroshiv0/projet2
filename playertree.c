@@ -48,10 +48,12 @@ int isThereBombs(tree);
 bool isThereWalls(tree);
 bool isThereBonuses(tree);
 bool isThereEnemies(tree);
+bool isThereExit(tree);
 bool sMapBomb(tree);
 bool sMapWalls(tree);
 bool sMapBonuses(tree);
 bool sMapEnemy(tree);
+bool sMapExit(tree);
 int NearEnemy(tree);
 action escapeBomb(tree,int,int);
 bool bombThreat(tree,int,int);
@@ -66,6 +68,7 @@ int escapeGhost(tree);
 int posMax3(int,int,int);
 int posMax2(int,int);
 void order4(int*,int*,int*,int*);
+int goToExit(tree map);
 /*
   bomberman function:
   This function randomly select a valid move for BOMBERMAN based on its current position on the game map.
@@ -85,26 +88,9 @@ action bomberman(
     int bomb=isThereBombs(map);
     if (bomb==-1) {
         if (isThereEnemies(map)){
-          switch(NearEnemy(map)){
-            case 1:
-              a=NORTH;
-              break;
-            case 2:
-              a=EAST;
-              break;
-            case 3:
-              a=SOUTH;
-              break;
-            case 4:
-              a=WEST;
-              break;
-            case 5:
-              a=BOMBING;
-              break;
-            case 6://we aren't near an enemy
-              int acttodo=GoNearEnemy(map);
-                //printf("Go Near Walls\n");
-                switch (acttodo) 
+          if (isThereExit(map)){
+            int acttodo=GoNearExit(map);
+            switch (acttodo) 
                 {
                   case 1:
                     a=NORTH;
@@ -126,9 +112,52 @@ action bomberman(
                     //printf("called randomMove\n");
                     break;            
                 }
-              break;
           }
-        }
+          else{
+            switch(NearEnemy(map)){
+              case 1:
+                a=NORTH;
+                break;
+              case 2:
+                a=EAST;
+                break;
+              case 3:
+                a=SOUTH;
+                break;
+              case 4:
+                a=WEST;
+                break;
+              case 5:
+                a=BOMBING;
+                break;
+              case 6://we aren't near an enemy
+                int acttodo=GoNearEnemy(map);
+                  //printf("Go Near Walls\n");
+                  switch (acttodo) 
+                  {
+                    case 1:
+                      a=NORTH;
+                      break;
+                    case 2:
+                      a=EAST;
+                      break;
+                    case 3:
+                      a=SOUTH;
+                      break;
+                    case 4:
+                      a=WEST;
+                      break;
+                    case 5:
+                      a=BOMBING;
+                      break;
+                    default:
+                      a=randommove(map);
+                      //printf("called randomMove\n");
+                      break;            
+                  }
+                break;
+            }
+        }}
         else{
           if (isThereBonuses(map)){
             int acttodo=GoNearBonuses(map);
@@ -305,6 +334,14 @@ int GoNearEnemy(tree map){//se rapproche d'un mur et pose une bombe
   return posMin4(ndep,edep,sdep,wdep);   
 }
 
+int goToExit(tree map){//se rapproche d'un mur et pose une bombe  
+  int ndep=depthChar(map->n,0,EXIT);
+  int edep=depthChar(map->e,0,EXIT);
+  int sdep=depthChar(map->s,0,EXIT);
+  int wdep=depthChar(map->w,0,EXIT);
+  if (ndep==0 || edep==0 || sdep==0 || wdep==0) return 5;
+  else return posMin4(ndep,edep,sdep,wdep);   
+}
 int depthChar(tree toexp,int depth,char chartofind){//gives the depth at which a specific character is found in a character tree. If not found, returns 10000.(val "infinite")
   if (toexp==0) return 10000;//if the subtree is empty
   else{
@@ -714,7 +751,7 @@ action choose_Side(tree map,int explosion_range){
           else {a=SOUTH;
           printf("south at list");}
         }
-        else SOUTH;
+        else a=SOUTH;
     }
     else { 
         if (depthCharEnemy(map->w,0)<=4){
@@ -823,6 +860,14 @@ bool sMapEnemy(tree map){
   if (map==0) return false;
   else if (IsAnEnemy(map)) return true;
   else return (sMapEnemy(map->n)||sMapEnemy(map->e)||sMapEnemy(map->s)||sMapEnemy(map->w));
+}
+bool isThereExit(tree map){
+	return sMapExit(map->n) || sMapExit(map->e) || sMapExit(map->s) || sMapExit(map->w);
+}
+bool sMapExit(tree map){
+  if (map==0) return false;
+  else if (map->c==EXIT) return true;
+  else return (sMapExit(map->n)||sMapExit(map->e)||sMapExit(map->s)||sMapExit(map->w));
 }
 action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is threatened directly by a bomb.
   bool isthreatened;
