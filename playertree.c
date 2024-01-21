@@ -252,7 +252,7 @@ action bomberman(
     else {a=escapeBomb(map,bomb,explosion_range);
     	  //printf("called escapeBomb\n");
     }}
-    return SafeLook(map,a);
+    return SafeLook(map,a,bomb_remaining);
 }
 
 /*
@@ -282,10 +282,11 @@ void printAction(action a) {
   }
 }
 
-action SafeLook(tree map,action a) {
+action SafeLook(tree map,action a,int remaining_bombs) {
   switch(a) {
   case BOMBING:
-    return BOMBING;
+  	if (remaining_bombs==0) return SafeLook(map,randommove(map));
+  	else return BOMBING;
     break;
   case NORTH:
     if ((map->n)->c==BREAKABLE_WALL||(map->n)->c==WALL ||(map->n)->c==BOMB){
@@ -713,7 +714,7 @@ action randommove(tree map){//do a random move(not bombing)
       printBoolean(ok);
       printf("\n");
     }
-  } while(!ok && cpt<=20);
+  } while(!ok && cpt<=100);
 	if (cpt==21){a=BOMBING;
 	printf("suicide :(");}
   return a; // answer to the game engine
@@ -1161,6 +1162,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   //try and verify if north is valid
   if (map->n != 0){
     if ((map->n)->c ==PATH){
+      if (depthCharEnemy(map->n,0)>3){
       if (!((bpos[0]+1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0]+1)<=explosion_range))){
       	//printf("north? %d %d",bpos[0],bpos[1]);
       	if ((map->n)->n!=0){
@@ -1182,13 +1184,131 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
       		}
       	
       	}
-      	}
+      	}}
     }
   } 
   if (!choose){
   	//try and verify if east is valid
 	  if (map->e != 0){
+	    
 	    if ((map->e)->c ==PATH){
+	    if (depthCharEnemy(map->e,0)>3){
+	      if (!((bpos[0]==0) && (abs(bpos[1]-1)<=explosion_range)) && !((bpos[1]-1==0) && (abs(bpos[0])<=explosion_range))){
+	      	if ((map->e)->n!=0){
+	      		if (((map->e)->n)->c==PATH){
+		      		a=EAST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->e)->e!=0){
+	      		if (((map->e)->e)->c==PATH){
+		      		a=EAST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->e)->s!=0){
+	      		if (((map->e)->s)->c==PATH){
+		      		a=EAST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	
+	      	}
+	      	}
+	    } 
+	  }}
+  }
+  if (!choose){
+	  if (map->s != 0){
+	  
+	    if ((map->s)->c ==PATH){
+	    if (depthCharEnemy(map->s,0)>3){
+	      if (!((bpos[0]-1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0]-1)<=explosion_range))){
+	      	if (((map->s)->s)->c!=0){
+	      		if (((map->s)->s)->c==PATH){
+		      		a=SOUTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if (((map->s)->e)->c!=0){
+	      		if (((map->s)->e)->c==PATH){
+		      		a=SOUTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if (((map->s)->w)->c!=0){
+	      		if (((map->s)->w)->c==PATH){
+		      		a=SOUTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	
+	      	}
+	      	}}
+	    } 
+	  }
+  }
+  if (!choose){
+	  if (map->w != 0){
+	    if ((map->w)->c ==PATH){
+	    if (depthCharEnemy(map->w,0)>3){
+	      if (!((bpos[0]==0) && (abs(bpos[1]+1)<=explosion_range)) && !((bpos[1]+1==0) && (abs(bpos[0])<=explosion_range))){
+	      	if (((map->w)->n)->c!=0){
+	      		if (((map->w)->n)->c==PATH){
+		      		a=WEST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->w)->w!=0){
+	      		if (((map->w)->w)->c==PATH){
+		      		a=WEST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->w)->s!=0){
+	      		if (((map->w)->s)->c==PATH){
+		      		a=WEST;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	
+	      	}
+	      	}
+	    }} 
+	  }
+  }
+  if (!choose){
+	  if (map->n != 0){
+	    if ((map->n)->c ==PATH){
+	      
+	      if (!((bpos[0]+1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0]+1)<=explosion_range))){
+	      	//printf("north? %d %d",bpos[0],bpos[1]);
+	      	if ((map->n)->n!=0){
+	      		if (((map->n)->n)->c==PATH){
+		      		a=NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->n)->e!=0){
+	      		if (((map->n)->e)->c==PATH){
+		      		a=NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	}
+	      	if ((map->n)->w!=0){
+	      		if (((map->n)->w)->c==PATH){
+		      		a=NORTH;//if north move don't verify "go on the same line than the bomb and diff of col put bomberman in danger" we do it.
+		      		choose=true;
+	      		}
+	      	
+	      	}
+	      	}
+	    }
+	  } 
+	  }
+  if (!choose){
+  	//try and verify if east is valid
+	  if (map->e != 0){
+	    
+	    if ((map->e)->c ==PATH){
+	    
 	      if (!((bpos[0]==0) && (abs(bpos[1]-1)<=explosion_range)) && !((bpos[1]-1==0) && (abs(bpos[0])<=explosion_range))){
 	      	if ((map->e)->n!=0){
 	      		if (((map->e)->n)->c==PATH){
@@ -1215,7 +1335,9 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   }
   if (!choose){
 	  if (map->s != 0){
+	  
 	    if ((map->s)->c ==PATH){
+	    
 	      if (!((bpos[0]-1==0) && (abs(bpos[1])<=explosion_range)) && !((bpos[1]==0) && (abs(bpos[0]-1)<=explosion_range))){
 	      	if (((map->s)->s)->c!=0){
 	      		if (((map->s)->s)->c==PATH){
@@ -1243,6 +1365,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   if (!choose){
 	  if (map->w != 0){
 	    if ((map->w)->c ==PATH){
+	    
 	      if (!((bpos[0]==0) && (abs(bpos[1]+1)<=explosion_range)) && !((bpos[1]+1==0) && (abs(bpos[0])<=explosion_range))){
 	      	if (((map->w)->n)->c!=0){
 	      		if (((map->w)->n)->c==PATH){
@@ -1264,7 +1387,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
 	      	
 	      	}
 	      	}
-	    } 
+	    }
 	  }
   }
   if (!choose){ a= randommove(map);//if it don't work,we return at list a random move
