@@ -674,7 +674,8 @@ action choose_Side(tree map,int explosion_range){
             a=WEST;
             printf("at least 2 path at west\n");
           }
-          else a=NORTH;printf("north at least:/ \n");
+          else {a=NORTH;
+          printf("north at least:/ \n");}
         }
         else{switch (posMax4(npath,epath,spath,wpath))
         {
@@ -706,8 +707,9 @@ action choose_Side(tree map,int explosion_range){
           else if (temp2==spath && temp2 >=2){printf("at least 2 path at south\n");
             a=SOUTH;
           }
-          else a=EAST;printf("east at least:/ \n");
-        }
+          else{ a=EAST;
+          printf("east at least:/ \n");
+        }}
         else{switch (posMax4(npath,epath,spath,wpath))
         {
         case 1:
@@ -738,7 +740,8 @@ action choose_Side(tree map,int explosion_range){
           else if (temp2==wpath && temp2 >=2){printf("at least 2 path at wesr\n");
             a=WEST;
           }
-          else a=SOUTH;
+          else {a=SOUTH;
+          printf("south at list");}
         }
         else{switch (posMax4(npath,epath,spath,wpath))
         {
@@ -760,16 +763,17 @@ action choose_Side(tree map,int explosion_range){
     }
     else { printf("ebemy at west\n");
         if (depthCharEnemy(map->w,0)<=6){
-          if (temp2==wpath && temp2 >=2){printf("at least 2 path at wesr\n");
-            a=WEST;
+          if (temp2==epath && temp2 >=2){printf("at least 2 path at east\n");
+            a=EAST;
           }
-          else if (temp2==npath && temp2 >=2){
+          else if (temp2==npath && temp2 >=2){printf("at least 2 path at north\n");
             a=NORTH;
           }
-          else if (temp2==spath && temp2 >=2){
+          else if (temp2==spath && temp2 >=2){printf("at least 2 path at south\n");
             a=SOUTH;
           }
-          else a=EAST;
+          else{ a=WEST;
+          printf("west at list");}
         }
     }
     //si on a un ennemi on préfère éviter ce coté et on prendds le chemin du dessous.Faire attention à la distance de l'ennemi si elle est trop grande!
@@ -858,7 +862,7 @@ bool sMapBonuses(tree map){
   else return (sMapBonuses(map->n)||sMapBonuses(map->e)||sMapBonuses(map->s)||sMapBonuses(map->w));
 }
 bool isThereEnemies(tree map){//return if player see an enemy
-  return sMapEnnemy(map->n) || sMapEnnemy(map->e) || sMapEnnemy(map->s) || sMapEnnemy(map->w);
+  return sMapEnemy(map->n) || sMapEnemy(map->e) || sMapEnemy(map->s) || sMapEnemy(map->w);
 }
 bool sMapEnemy(tree map){
   if (map==0) return false;
@@ -1211,49 +1215,49 @@ bool IsAGhost(tree map){//say if it's a ghost or not(here for a shorter syntax)
 int escapeGhost(tree map){
   if (IsAGhost(map->n)){
     if (map->s!=0){
-      if ((map->s)==PATH || (map->s)==FLAME_BONUS || ((map->s)==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->s)->c==PATH || (map->s)->c==FLAME_BONUS || ((map->s)->c==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->e!=0){
-      if ((map->e)==PATH || (map->e)==FLAME_BONUS || ((map->e)==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->e)->c==PATH || (map->e)->c==FLAME_BONUS || ((map->e)->c==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->w!=0){
-      if ((map->w)==PATH || (map->w)==FLAME_BONUS || ((map->w)==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->w)->c==PATH || (map->w)->c==FLAME_BONUS || ((map->w)->c==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     return 1;//else we go on the ghost to exploit the fact that enemies are computed in the same time than player(it won't kill us) 
   }
   if (IsAGhost(map->e)){
     if (map->w!=0){
-      if ((map->w)==PATH || (map->w)==FLAME_BONUS || ((map->w)==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->w)->c==PATH || (map->w)->c==FLAME_BONUS || ((map->w)->c==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->n!=0){
-      if ((map->n)==PATH || (map->n)==FLAME_BONUS || ((map->n)==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->n)->c==PATH || (map->n)->c==FLAME_BONUS || ((map->n)->c==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->s!=0){
-      if ((map->s)==PATH || (map->s)==FLAME_BONUS || ((map->s)==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->s)->c==PATH || (map->s)->c==FLAME_BONUS || ((map->s)->c==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     return 2;//else we go on the ghost to exploit the fact that enemies are computed in the same time than player(it won't kill us) 
   }
   if (IsAGhost(map->s)){
     if (map->n!=0){
-      if ((map->n)==PATH || (map->n)==FLAME_BONUS || ((map->n)==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->n)->c==PATH || (map->n)->c==FLAME_BONUS || ((map->n)->c==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->e!=0){
-      if ((map->e)==PATH || (map->e)==FLAME_BONUS || ((map->e)==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->e)->c==PATH || (map->e)->c==FLAME_BONUS || ((map->e)->c==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->w!=0){
-      if ((map->w)==PATH || (map->w)==FLAME_BONUS || ((map->w)==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->w)->c==PATH || (map->w)->c==FLAME_BONUS || ((map->w)->c==BOMB_BONUS)) return 4;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     return 3;//else we go on the ghost to exploit the fact that enemies are computed in the same time than player(it won't kill us) 
   }
   if (IsAGhost(map->w)){
     if (map->e!=0){
-      if ((map->e)==PATH || (map->e)==FLAME_BONUS || ((map->e)==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->e)->c==PATH || (map->e)->c==FLAME_BONUS || ((map->e)->c==BOMB_BONUS)) return 2;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->n!=0){
-      if ((map->n)==PATH || (map->n)==FLAME_BONUS || ((map->n)==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->n)->c==PATH || (map->n)->c==FLAME_BONUS || ((map->n)->c==BOMB_BONUS)) return 1;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     if (map->s!=0){
-      if ((map->s)==PATH || (map->s)==FLAME_BONUS || ((map->s)==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
+      if ((map->s)->c==PATH || (map->s)->c==FLAME_BONUS || ((map->s)->c==BOMB_BONUS)) return 3;//we choose the oposite direction in priority beacause enemy are most supposed to turn when  there is an multiple path around him
     }
     return 4;//else we go on the ghost to exploit the fact that enemies are computed in the same time than player(it won't kill us) 
   }
