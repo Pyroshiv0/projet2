@@ -28,7 +28,7 @@ extern const int VIEW_DISTANCE; // bomberman view distance
 
 extern bool DEBUG; // indicates whether the game runs in DEBUG mode
 
-const char * binome="Random"; // student name goes here
+const char * binome="Evan Aubriet"; // student name goes here
 
 // prototypes of the local functions/procedures
 void printAction(action);
@@ -61,7 +61,7 @@ int* posBomb(tree,int*);
 action randomSafeMove(tree,int,int);
 void addTab(int*,int*,int);
 void copyTab(int*,int*,int);
-action SafeLook(tree,action);
+action SafeLook(tree,action,int);
 bool IsAnEnemy(tree);
 bool IsAGhost(tree);
 int escapeGhost(tree);
@@ -252,7 +252,7 @@ action bomberman(
     else {a=escapeBomb(map,bomb,explosion_range);
     	  //printf("called escapeBomb\n");
     }}
-    return SafeLook(map,a,bomb_remaining);
+    return SafeLook(map,a,remaining_bombs);
 }
 
 /*
@@ -285,36 +285,36 @@ void printAction(action a) {
 action SafeLook(tree map,action a,int remaining_bombs) {
   switch(a) {
   case BOMBING:
-  	if (remaining_bombs==0) return SafeLook(map,randommove(map));
+  	if (remaining_bombs==0) return SafeLook(map,randommove(map),remaining_bombs);
   	else return BOMBING;
     break;
   case NORTH:
     if ((map->n)->c==BREAKABLE_WALL||(map->n)->c==WALL ||(map->n)->c==BOMB){
       //printf("north is deadlygo randomMove");
-      return SafeLook(map,randommove(map));
+      return SafeLook(map,randommove(map),remaining_bombs);
     }
     break;
   case EAST:
     if ((map->e)->c==BREAKABLE_WALL||(map->e)->c==WALL ||(map->e)->c==BOMB){
       //printf("east is deadlygo randomMove");
-      return SafeLook(map,randommove(map));
+      return SafeLook(map,randommove(map),remaining_bombs);
     }
     break;
   case SOUTH:
     if ((map->s)->c==BREAKABLE_WALL||(map->s)->c==WALL ||(map->s)->c==BOMB){
       //printf("south is deadlygo randomMove");
-      return SafeLook(map,randommove(map));
+      return SafeLook(map,randommove(map),remaining_bombs);
     }
     break;
   case WEST:
     if ((map->w)->c==BREAKABLE_WALL||(map->w)->c==WALL ||(map->w)->c==BOMB){
       //printf("west is deadlygo randomMove");
-      return SafeLook(map,randommove(map));
+      return SafeLook(map,randommove(map),remaining_bombs);
     }
     break;
   default:
   	//printf("NO Action?go randomMove");
-    return SafeLook(map,randommove(map));
+    return SafeLook(map,randommove(map),remaining_bombs);
   	break;
   }
   return a;
@@ -715,7 +715,7 @@ action randommove(tree map){//do a random move(not bombing)
       printf("\n");
     }
   } while(!ok && cpt<=100);
-	if (cpt==21){a=BOMBING;
+	if (cpt==21){a=BOMBING;}
 	
   return a; // answer to the game engine
 }
@@ -769,7 +769,7 @@ action choose_Side(tree map,int explosion_range){
             a=SOUTH;
           }
           else{ a=EAST;
-          printf(
+          
           }
         }
         else a=EAST;
