@@ -716,7 +716,7 @@ action randommove(tree map){//do a random move(not bombing)
     }
   } while(!ok && cpt<=100);
 	if (cpt==21){a=BOMBING;
-	printf("suicide :(");}
+	
   return a; // answer to the game engine
 }
 
@@ -732,81 +732,81 @@ action choose_Side(tree map,int explosion_range){
     int temp3=spath;
     int temp4=wpath;
     order4(&temp1,&temp2,&temp3,&temp4);
-    printf("temp1=%d temp2=%d temp3=%d temp4=%d\n npath=%d epath=%d spath=%d, wpath=%d\n",temp1,temp2,temp3,temp4,npath,epath,spath,wpath);
+   
     if (temp1==npath){
-    	printf("north is main");
+    	
         if (depthCharEnemy(map->n,0)<=4){//si on a un ennemi proche au nord
-          printf("ebemy at north\n");
+          
           //on va au second chemin indiqué par temp2
           if (temp2==spath && temp2 >=2){
             a=SOUTH;
-            printf("at least 2 path at south\n");
+            
           }
           else if (temp2==epath && temp2 >=2){
-            a=EAST;printf("at least 2 path at east\n");
+            a=EAST;
           }
           else if (temp2==wpath && temp2 >=2){
             a=WEST;
-            printf("at least 2 path at west\n");
+            
           }
           else {a=NORTH;
-          printf("north at least:/ \n");}
+          }
         }
         else a=NORTH;
     }
     else if (temp1==epath){
-    	printf("east is main");
+    	
         if (depthCharEnemy(map->e,0)<=4){
-          printf("ebemy at east\n");
+          
           if (temp2==wpath && temp2 >=2){
             a=WEST;
-            printf("at least 2 path at wesr\n");
+            
           }
-          else if (temp2==npath && temp2 >=2){printf("at least 2 path at north\n");
+          else if (temp2==npath && temp2 >=2){
             a=NORTH;
           }
-          else if (temp2==spath && temp2 >=2){printf("at least 2 path at south\n");
+          else if (temp2==spath && temp2 >=2){
             a=SOUTH;
           }
           else{ a=EAST;
-          printf("east at least:/ \n");
+          printf(
           }
         }
         else a=EAST;
     }
     else if (temp1==spath){  
-    	printf("south is main");
+    	
         if (depthCharEnemy(map->s,0)<=4){ 
-          printf("enemy at south\n");
-          if (temp2==npath && temp2 >=2){printf("at least 2 path at north\n");
+          
+          if (temp2==npath && temp2 >=2){
             a=NORTH;
           }
-          else if (temp2==epath && temp2 >=2){printf("at least 2 path at east\n");
+          else if (temp2==epath && temp2 >=2){
             a=EAST;
           }
-          else if (temp2==wpath && temp2 >=2){printf("at least 2 path at wesr\n");
+          else if (temp2==wpath && temp2 >=2){
             a=WEST;
           }
           else {a=SOUTH;
-          printf("south at list");}
+          }
         }
         else a=SOUTH;
     }
     else { 
-    	printf("west is main");
+    	
         if (depthCharEnemy(map->w,0)<=4){
-          printf("enemy at west\n");
-          if (temp2==epath && temp2 >=2){printf("at least 2 path at east\n");
+          
+          if (temp2==epath && temp2 >=2){
             a=EAST;
           }
-          else if (temp2==npath && temp2 >=2){printf("at least 2 path at north\n");
+          else if (temp2==npath && temp2 >=2){
             a=NORTH;
           }
-          else if (temp2==spath && temp2 >=2){printf("at least 2 path at south\n");
+          else if (temp2==spath && temp2 >=2){
             a=SOUTH;
           }
           else{ a=WEST;
-          printf("west at list");}
+         }
         }
         else a=WEST;
     }
@@ -927,13 +927,13 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
       break;
   }
   action a;
-  printf("threat?:%d",isthreatened);
+  
   if (isthreatened){
     bool found=false; 
     switch (bpos)
     {
     case 1:
-    printf("bomb at north");
+    
       if ((map->e)->c==PATH){//si on a bien un chemin valide
         if (((map->e)->s)!=0){
           if ((((map->e)->s)->c==PATH)){ a= EAST;found=true;}
@@ -954,39 +954,39 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
       if (!found) a= SOUTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       printAction(a);
-      printf("action retenue.\n");
+      
       break;
     case 2:
-    	printf("bomb at EASTt");
+    	
       if ((map->n)->c==PATH){//si on a bien un chemin valide
-      printf("NORD CHEMIN");
+     
         if (((map->n)->w)!=0){
-          printf("case au nord west:%c",(((map->n)->w)->c));
+         
           if ((((map->n)->w)->c==PATH)) {a=NORTH;found=true;}
         }//si la case au sud est valide
         if (((map->n)->n)!=0){
-        	printf("case au nord nord:%c",(((map->n)->n)->c));
+        	
           if ((((map->n)->n)->c==PATH)){ a=NORTH;found=true;}
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
       if ((map->s)->c==PATH && !found){//si on a bien un chemin valide
-      	printf("SUD CHEMIN");
+      	
         if (((map->s)->w)!=0){
-        printf("case au sud west:%c",(((map->s)->w)->c));
+        
           if ((((map->s)->w)->c==PATH)){ a=SOUTH;found=true;}
         }//si la case au sud est valide
         if (((map->s)->s)!=0){
-        printf("case au sud sud:%c",(((map->s)->s)->c));
+       
           if ((((map->s)->s)->c==PATH)) {a=SOUTH;found=true;}
       }}//si la case au sud est valide
       if (!found) a=WEST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       printAction(a);
-      printf("action retenue.\n");
+      
       break;
     case 3:
-    	printf("bomb at soouth");
+    	
       if ((map->e)->c==PATH){//si on a bien un chemin valide
         if (((map->e)->n)!=0){
           if ((((map->e)->n)->c==PATH)){a= EAST;found=true;}
@@ -998,44 +998,44 @@ action escapeBomb(tree map,int bpos,int explosion_range){//check if bomberman is
       }
       if ((map->w)->c==PATH && !found){//si on a bien un chemin valide
         if (((map->w)->n)!=0){
-        printf("case à l'west nord:%c",(((map->w)->n)->c));
+        
           if ((((map->w)->n)->c==PATH)){ a= WEST;found=true;}
         }//si la case au sud est valide
         if (((map->w)->w)!=0){
-        printf("case à l'west west:%c",(((map->w)->w)->c));
+        
           if ((((map->w)->w)->c==PATH)) {a= WEST;found=true;}
         }}//si la case au sud est valide
       if (!found) a=NORTH;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       printAction(a);
-      printf("action retenue.\n");
+      
       break;
     case 4:
-    printf("bomb at west");
+    
       if ((map->n)->c==PATH){//si on a bien un chemin valide
         if (((map->n)->e)!=0){
-        printf("case au nord est:%c",(((map->n)->e)->c));
+        
           if ((((map->n)->e)->c==PATH)) {a= NORTH;found=true;}
         }//si la case au sud est valide
         if (((map->n)->n)!=0){
-        	printf("case au nord nord:%c",(((map->n)->n)->c));
+        
           if ((((map->n)->n)->c==PATH)){ a=NORTH;found=true;}
         }//si la case au sud est valide
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       }
       if ((map->s)->c==PATH && !found){//si on a bien un chemin valide
         if (((map->s)->e)!=0){
-        	printf("case au sud est:%c",(((map->s)->e)->c));
+        
           if ((((map->s)->e)->c==PATH)){ a=SOUTH;found=true;}
         }//si la case au sud est valide
         if (((map->s)->s)!=0){
-        	printf("case au sud sud :%c",(((map->s)->s)->c));
+        	
           if ((((map->s)->s)->c==PATH)) {a=SOUTH;found=true;}
         }}//si la case au sud est valide
       if(!found) a=EAST;//si les cases sur les cotés sont invalides(à noter:on peut perdre ici car pas de vérification)
         //note: on pourrait revenir au nord ,mais c'est complexe à implémenter pour quelque chose de peut être pas nécessaire
       printAction(a);
-      printf("action retenue.\n");
+   
       break;
     default:
       break;
@@ -1158,7 +1158,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
   }
   action a;
   bool choose=false;
-  printf("bpos : (%d,%d)",bpos[0],bpos[1]);
+  
   //try and verify if north is valid
   if (map->n != 0){
     if ((map->n)->c ==PATH){
@@ -1391,7 +1391,7 @@ action randomSafeMove(tree map,int bdir,int explosion_range){//return a random s
 	  }
   }
   if (!choose){ a= randommove(map);//if it don't work,we return at list a random move
-  printf("uh? \n");
+  
   }
   printAction(a);
   return a;
@@ -1511,6 +1511,6 @@ int escapeGhost(tree map){
     }
     return 4;//else we go on the ghost to exploit the fact that enemies are computed in the same time than player(it won't kill us) 
   }
-  printf("anormal behaviour:use bombing \n");
+
   return 5;//never get here because we call a fonction if there is a ghost near us.
 }
